@@ -1,0 +1,30 @@
+mailto-gmail - A script to use Gmail as default email client.
+Copyright 2010 Jesús Torres <aplatanado@gulic.org>
+
+
+Description
+-----------
+
+mailto-gmail is a Perl script that opens the compose mail page of Gmail in the
+default browser, filling fields like To or Cc with the information provides by
+the user trough the command-line arguments.
+
+This script allows to use Gmail as default email client, much like any other
+desktop client.
+
+
+Usage
+-----
+
+mailto-gmail only needs the recipient address, for instance:
+
+$ ./mailto-gmail user@mail.com
+
+It also have options like '--subject', '--cc', '--bcc' and '--body' to specify
+the email fields. Futher, mailto-gmail supports the Gmail in Google Apps
+trough the option '--domain'. If it appears in command-line, the script will
+open the Gmail in Google Apps for the specified domain instead of the generic
+one.
+
+
+-- Jesús Torres <aplatanado@gulic.org>

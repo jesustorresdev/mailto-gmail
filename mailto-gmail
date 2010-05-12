@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+#
+# mailto-gmail - A script to use Gmail as default email client.
+#
+# Copyright 2009 Jesús Torres <aplatanado@gulic.org>
+#
+# mailto-gmail comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+# This is free software, and you are welcome to redistribute it
+# under certain conditions; see COPYING for details.
+#
+
+use strict;
+use Getopt::Long;
+use File::Basename;
+
+# Configuration
+my $GMAIL_URL="https://mail.google.com/mail/?extsrc=mailto&url=%s";
+my $GAPPS_GMAIL_URL="https://mail.google.com/a/%s/mail/?extsrc=mailto&url=%s";
+my $BROWSER_BIN="xdg-open";
+
+
+sub HELP_MESSAGE()
+{
+    my $program_name = basename($0);
+    print << "EOF";
+
+Usage: $program_name [options] [address]
+
+Options:
+  --help                    Show help about options
+  -s, --subject <subject>   Set subject of message
+  -c, --cc <address>        Send CC: to 'address'
+  -b, --bcc <address>       Send BCC: to 'address'
+  --body <text>             Set body of message
+  --browser <program>       Set web browser
+  --domain <domain>         Google Apps domain name
+
+Arguments:
+  address                   Send message to 'address'
+EOF
+    exit;
+}
+    
+sub urlencode($a)
+{
+    my $str = shift(@_);
+    
+    $str =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
+    return $str;
+}
+
+sub main()
+{
+    my $help;
+    my ($subject, $cc, $bcc, $body, $domain);
+    my $browser = $BROWSER_BIN;
+    my ($query, $url);
+
+    # Parse command-line arguments
+    GetOptions('help|?'    => \$help,
+               'subject=s' => \$subject,
+               'cc=s'      => \$cc,
+               'bcc|b=s'   => \$bcc,
+               'body=s'    => \$body,
+               'browser=s' => \$browser,
+               'domain=s'  => \$domain);
+    HELP_MESSAGE if $help or not $ARGV[0];
+ 
+    $query  = "mailto:$ARGV[0]?";
+    $query .= "&subject=".&urlencode($subject) if $subject;
+    $query .= "&cc=".&urlencode($cc) if $cc;
+    $query .= "&bcc=".&urlencode($bcc) if $bcc;
+    $query .= "&body=".&urlencode($body) if $body;
+    $query = &urlencode($query);
+ 
+    # Open URL
+    if ($domain) {
+      $url = sprintf($GAPPS_GMAIL_URL, $domain, $query);
+    } else {
+      $url = sprintf($GMAIL_URL, $query);
+    }
+    exec("$browser \'$url\'");
+}
+
+main();
